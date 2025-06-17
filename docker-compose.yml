@@ -14,8 +14,23 @@ services:
   springboot-backend-service:
     build:
       context: ./examapp
+    depends_on:
+      - postgres_db
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres_db:5432/post
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: admin
     ports:
       - "8080:8080"
+
+  frontend:
+    build:
+      context: ./exam-app-frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - springboot-backend-service
 
 volumes:
   pgdata:
