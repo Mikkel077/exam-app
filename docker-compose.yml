@@ -1,0 +1,21 @@
+services:
+  postgres_db:
+    image: postgres:latest
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USERNAME: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: post
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
+  springboot-backend-service:
+    build:
+      context: ./examapp
+    ports:
+      - "8080:8080"
+
+volumes:
+  pgdata:
