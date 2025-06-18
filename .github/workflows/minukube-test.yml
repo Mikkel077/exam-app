@@ -1,0 +1,58 @@
+name: 🧪 Minikube Smoke Test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  smoke-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Minikube
+        uses: manusa/actions-setup-minikube@v3
+        with:
+          minikube version: 'latest'
+          kubernetes version: 'latest'
+
+      - name: Configure kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Pull images into Minikube
+        run: |
+          docker pull ghcr.io/mikkel077/exam-app/backend:latest
+          docker pull ghcr.io/mikkel077/exam-app/frontend:latest
+          minikube image load ghcr.io/mikkel077/exam-app/backend:latest
+          minikube image load ghcr.io/mikkel077/exam-app/frontend:latest
+
+      - name: Deploy to Minikube
+        run: |
+          kubectl apply -f k8s/ -R
+
+      - name: Wait for backend rollout
+        run: kubectl rollout status deployment/backend --timeout=120s
+
+      - name: Wait for frontend rollout
+        run: kubectl rollout status deployment/frontend --timeout=120s
+
+      - name: Smoke test HTTP endpoints via Ingress
+        run: |
+          # 1) Start port-forward in the background
+          kubectl port-forward \
+            -n ingress-nginx svc/ingress-nginx-controller 80:80 443:443 \
+            --address 0.0.0.0 &
+
+          # 2) Give it a few seconds to come up
+          sleep 25
+
+          # 3) Hit your backend actuator via the ingress hostname
+          echo "Testing http://exam-app.local/api/actuator/health"
+          curl --fail http://exam-app.local/api/actuator/health

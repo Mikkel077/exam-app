@@ -1,0 +1,38 @@
+name: Build & Push Frontend
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+  workflow_run:
+    workflows:
+      - Test Frontend
+    types:
+      - completed
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build-frontend:
+    # only run if the PR was merged (not just closed)
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build & push frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./exam-app-frontend
+          file: ./exam-app-frontend/Dockerfile
+          push: true
+          tags: ghcr.io/mikkel077/exam-app/frontend:latest
