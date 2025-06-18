@@ -35,4 +35,4 @@ jobs:
       - name: Install & run frontend tests
         run: |
           npm ci
-          npm test -- --watchAll=false
+          npm test
