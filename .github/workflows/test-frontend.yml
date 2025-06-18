@@ -7,8 +7,9 @@ on:
     branches-ignore:
       - 'docs/**'
   pull_request:
-    paths:
-      - 'exam-app-frontend/**'
+    branches:
+     - main
+     - dev
 
 jobs:
   test-frontend:
