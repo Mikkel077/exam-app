@@ -12,7 +12,7 @@ function App() {
         return <p style={{color: "red"}}>Error loading posts: {error.message}</p>;
     }
     if (posts.length === 0) {
-        return <p>No posts returned.</p>;
+        return <p>No posts returned!</p>;
     }
 
     return (
