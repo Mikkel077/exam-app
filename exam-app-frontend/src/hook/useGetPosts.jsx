@@ -4,7 +4,7 @@ import {useQuery} from "@tanstack/react-query";
 
 export default function useGetPosts() {
 
-    const BASE_URL = "http://localhost:8080/post";
+    const BASE_URL = "/api/post";
 
     const getPosts = async () => {
         const response = await axios.get(BASE_URL);

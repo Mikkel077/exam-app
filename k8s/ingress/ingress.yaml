@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: exam-app
+  annotations:
+    # tell nginx to treat the paths below as regexes
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    # rewrite the incoming path to the captured group
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+spec:
+  rules:
+    - host: exam-app.local
+      http:
+        paths:
+          # any /api/<whatever> maps to backend at /<whatever>
+          - path: /api/(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8080
+
+          # everything else maps to frontend, preserving the path
+          - path: /(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
