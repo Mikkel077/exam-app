@@ -16,9 +16,11 @@ permissions:
 
 jobs:
   build-frontend:
-    # only run if the PR was merged (not just closed)
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout code
