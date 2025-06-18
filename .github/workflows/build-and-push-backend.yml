@@ -1,5 +1,4 @@
 name: 📦 Build & Push Backend
-needs: test-backend
 
 on:
   pull_request:
