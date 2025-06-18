@@ -40,3 +40,4 @@ jobs:
           file: ./examapp/Dockerfile
           push: true
           tags: ghcr.io/mikkel077/exam-app/backend:latest
+          platforms: linux/amd64
