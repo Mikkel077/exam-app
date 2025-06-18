@@ -1,0 +1,38 @@
+name: Test Frontend
+
+on:
+  push:
+    paths:
+      - 'exam-app-frontend/**'
+    branches-ignore:
+      - 'docs/**'
+  pull_request:
+    paths:
+      - 'exam-app-frontend/**'
+
+jobs:
+  test-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: exam-app-frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 18
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('exam-app-frontend/**/package-lock.json') }}
+
+      - name: Install & run frontend tests
+        run: |
+          npm ci
+          npm test -- --watchAll=false
