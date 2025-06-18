@@ -7,8 +7,8 @@ on:
     branches-ignore:
       - 'docs/**'
   pull_request:
-    - main
-    - dev
+     - main
+     - dev
 
 jobs:
   test-frontend:
