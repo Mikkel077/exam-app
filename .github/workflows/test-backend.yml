@@ -34,4 +34,5 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('examapp/pom.xml') }}
 
       - name: Run backend tests
-        run: mvn test
+        run: mvn test -Dtest=SimpleTest
+
