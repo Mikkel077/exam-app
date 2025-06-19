@@ -1,0 +1,96 @@
+name: CICD
+
+on:
+ pull_request:
+    branches:
+      - main
+
+
+jobs:
+  backend-CI:
+    name: Builds backend and test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Cache Maven local repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-m2-${{ hashFiles('examapp/pom.xml') }}
+
+      - name: Build with Maven
+        run: mvn clean package -DskipTests -B
+
+      - name: Run backend tests
+        run: mvn test -Dtest=SimpleTest
+
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+  backend-build-push-image:
+    name: push to ghcr
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build & push backend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./examapp
+          file: ./examapp/Dockerfile
+          push: true
+          tags: ghcr.io/mikkel077/exam-app/backend:latest
+          platforms: linux/amd64
+
+  Frontend-CI:
+    name: Builds frontend and tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js 20
+        uses: actions/setup-node@v3
+        with:
+         node-version: '20'
+
+      - name: Cache node_modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-npm-${{ hashFiles('exam-app-frontend/**/package-lock.json') }}
+
+      - name: Install & run frontend tests
+        run: |
+          npm ci
+          npm test
+
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+  frontend-build-and-push-image:
+    name: push to ghcr
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build & push frontend image
+        uses: docker/build-push-action@v4
+        with:
+          context: ./exam-app-frontend
+          file: ./exam-app-frontend/Dockerfile
+          push: true
+          tags: ghcr.io/mikkel077/exam-app/frontend:latest
+          platforms: linux/amd64
