@@ -42,6 +42,7 @@ jobs:
   backend-build-push-image:
     name: push to ghcr
     runs-on: ubuntu-latest
+    needs: backend-CI
 
     steps:
       - name: Check out repo
@@ -89,6 +90,7 @@ jobs:
   frontend-build-and-push-image:
     name: push to ghcr
     runs-on: ubuntu-latest
+    needs: Frontend-CI
 
     steps:
       - name: Check out repo
