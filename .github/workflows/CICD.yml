@@ -6,6 +6,10 @@ on:
       - main
 
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   backend-CI:
     name: Builds backend and test
