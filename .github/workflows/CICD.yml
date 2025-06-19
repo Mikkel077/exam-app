@@ -37,16 +37,19 @@ jobs:
       - name: Run backend tests
         run: mvn test -Dtest=SimpleTest
 
-      - name: Log in to GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" \
-            | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-
   backend-build-push-image:
     name: push to ghcr
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
       - name: Build & push backend image
         uses: docker/build-push-action@v4
         with:
@@ -80,16 +83,19 @@ jobs:
           npm ci
           npm test
 
-      - name: Log in to GHCR
-        run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" \
-            | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
-
   frontend-build-and-push-image:
     name: push to ghcr
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Log in to GHCR
+        run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" \
+            | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
       - name: Build & push frontend image
         uses: docker/build-push-action@v4
         with:
