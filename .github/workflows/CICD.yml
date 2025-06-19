@@ -36,6 +36,7 @@ jobs:
         run: mvn clean package -DskipTests -B
 
       - name: Run backend tests
+        working-directory: ./examapp
         run: mvn test -Dtest=SimpleTest
 
   backend-build-push-image:
