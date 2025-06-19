@@ -32,6 +32,7 @@ jobs:
           key: ${{ runner.os }}-m2-${{ hashFiles('examapp/pom.xml') }}
 
       - name: Build with Maven
+        working-directory: ./examapp
         run: mvn clean package -DskipTests -B
 
       - name: Run backend tests
@@ -79,6 +80,7 @@ jobs:
           key: ${{ runner.os }}-npm-${{ hashFiles('exam-app-frontend/**/package-lock.json') }}
 
       - name: Install & run frontend tests
+        working-directory: ./exam-app-frontend
         run: |
           npm ci
           npm test
